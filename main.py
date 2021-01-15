@@ -3,33 +3,36 @@ from pprint import pprint # library to prettify our debug logs
 from bs4 import BeautifulSoup # Library to parse HTML pages
 import re
 
-def getMeaning(word):
-    # create url
+async def getMeaning(word):
     url = 'https://dle.rae.es/' + word
-    # get page
-    page = requests.get(url)
-    # parse HTML response
-    soup = BeautifulSoup(page.text, 'html.parser')
-    #pprint(soup)
+    page = requests.get(url) # Get page from url
+    soup = BeautifulSoup(page.text, 'html.parser') # Parse HTML response
 
     try:
-        #get definitions
-        definitions = []
-        #definitions = soup.find('p', {'class': 'j'}).text
-        #pprint(definitions)
-        for element in soup.find_all("p", class_="j"):
+        try:
+            #CHECK HERE IF WORD EXISTS
+            definitions = []
+            for element in soup.find_all("p", class_="j"):
 
-            #elementDefinition = re.sub('\d. *.. ', '', elementDefinition)
-            #elementDefinition =  re.compile("[A-Z]").split(elementDefinition)[1]# remove characters until MAYUS
-            #pprint(element.get_text())
+                #elementDefinition = re.sub('\d. *.. ', '', elementDefinition)
+                #elementDefinition =  re.compile("[A-Z]").split(elementDefinition)[1]# remove characters until MAYUS
+                #pprint(element.get_text())
+                elementDefinition = element.get_text()
+                definitions.append(elementDefinition)
+        except:
+            pprint('Meaning not found...')
+
+        try:
+            responseStr = ''
+            for e in definitions:
+                responseStr += e + '\n'
             
-            elementDefinition = element.get_text()
-            definitions.append(elementDefinition)
-    except:
-        pprint('Meaning not found..')
+            pprint(responseStr)
+        except:
+           pprint('Error displaying definition/s')
 
-    for e in definitions:
-        pprint(e)
+    except:
+       pprint('Something went wrong...')
 
 word = 'tren'
 word = word.strip() # remove both leading and trailing blank/space characters 
